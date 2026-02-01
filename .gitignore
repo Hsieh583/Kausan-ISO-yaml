@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Flask
+instance/
+.webassets-cache
+
+# Output files
+output/*.yaml
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

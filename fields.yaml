@@ -1,0 +1,18 @@
+# 表單欄位配置檔
+fields:
+  - name: name
+    label: 姓名
+    type: text
+    required: true
+  - name: email
+    label: 電子郵件
+    type: email
+    required: true
+  - name: phone
+    label: 電話
+    type: tel
+    required: false
+  - name: message
+    label: 留言
+    type: textarea
+    required: false
