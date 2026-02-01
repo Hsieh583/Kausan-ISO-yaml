@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAML 清單</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        th {
+            color: #444;
+            background: #f7f7f9;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-back {
+            background: #764ba2;
+            color: white;
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .empty {
+            color: #666;
+            font-size: 14px;
+            padding: 20px 0;
+        }
+
+        form {
+            display: inline;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .pagination a,
+        .pagination span {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #667eea;
+            font-size: 13px;
+        }
+
+        .pagination a:hover {
+            background: #f0f0f0;
+        }
+
+        .pagination .active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination .disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>YAML 清單</h1>
+        <p class="subtitle">可檢視、編輯或刪除已儲存的 YAML</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <div class="top-actions">
+            <form method="GET" action="{{ url_for('entries') }}" style="flex: 1; display: flex; gap: 10px;">
+                <input type="text" name="search" placeholder="搜尋姓名、信箱、電話或時間..." value="{{ search }}"
+                    style="flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;">
+                <button type="submit"
+                    style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">搜尋</button>
+                {% if search %}
+                <a href="{{ url_for('entries') }}"
+                    style="padding: 8px 16px; background: #999; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; display: flex; align-items: center;">清除</a>
+                {% endif %}
+            </form>
+            <a class="btn btn-back" href="{{ url_for('generate_test') }}" style="margin-left: 10px;">生成測試資料</a>
+            <a class="btn btn-back" href="{{ url_for('form') }}" style="margin-left: 10px;">新增表單</a>
+        </div>
+
+        {% if items %}
+        <p style="color: #666; margin-bottom: 10px; font-size: 13px;">共 {{ total }} 筆資料，目前顯示第 {{ page }} 頁</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>檔名</th>
+                    <th>姓名</th>
+                    <th>信箱</th>
+                    <th>電話</th>
+                    <th>提交時間</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.filename }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.email }}</td>
+                    <td>{{ item.phone }}</td>
+                    <td>{{ item.submitted_at }}</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-edit" href="{{ url_for('view_entry', filename=item.filename) }}">讀取</a>
+                            <a class="btn btn-edit" href="{{ url_for('edit_entry', filename=item.filename) }}">編輯</a>
+                            <form action="{{ url_for('delete_entry', filename=item.filename) }}" method="POST"
+                                onsubmit="return confirm('確定要刪除嗎？');">
+                                <button class="btn btn-delete" type="submit">刪除</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if total_pages > 1 and page_range %}
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="{{ url_for('entries', search=search, page=1) }}">首頁</a>
+            <a href="{{ url_for('entries', search=search, page=page-1) }}">上一頁</a>
+            {% else %}
+            <span class="disabled">首頁</span>
+            <span class="disabled">上一頁</span>
+            {% endif %}
+
+            {% for p in page_range %}
+            {% if p == page %}
+            <span class="active">{{ p }}</span>
+            {% else %}
+            <a href="{{ url_for('entries', search=search, page=p) }}">{{ p }}</a>
+            {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %} <a href="{{ url_for('entries', search=search, page=page+1) }}">下一頁</a>
+                <a href="{{ url_for('entries', search=search, page=total_pages) }}">末頁</a>
+                {% else %}
+                <span class="disabled">下一頁</span>
+                <span class="disabled">末頁</span>
+                {% endif %}
+
+                <span style="margin-left: 10px; color: #666; font-size: 13px;">第 {{ page }} / {{ total_pages }} 頁 (共 {{
+                    total }} 筆)</span>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty">目前尚無資料</div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

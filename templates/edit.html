@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>表單系統 - YAML 儲存</title>
+    <title>編輯 YAML</title>
     <style>
         * {
             margin: 0;
@@ -39,21 +39,8 @@
 
         .subtitle {
             color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .alert {
-            padding: 12px 20px;
-            border-radius: 6px;
             margin-bottom: 20px;
             font-size: 14px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
         }
 
         .form-group {
@@ -118,26 +105,36 @@
         .submit-btn:active {
             transform: translateY(0);
         }
+
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-back {
+            background: #764ba2;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>表單系統</h1>
-        <p class="subtitle">填寫表單後，資料將儲存為 YAML 檔案</p>
-        <p class="subtitle">
-            <a href="{{ url_for('entries') }}">回到 YAML 清單</a>
-        </p>
+        <h1>編輯 YAML</h1>
+        <p class="subtitle">檔名：{{ filename }}</p>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+        <div class="top-actions">
+            <span></span>
+            <a class="btn-back" href="{{ url_for('entries') }}">回到清單</a>
+        </div>
 
-        <form action="{{ url_for('submit') }}" method="POST">
+        <form action="{{ url_for('edit_entry', filename=filename) }}" method="POST">
             {% for field in fields %}
             <div class="form-group">
                 <label for="{{ field.name }}">
@@ -149,15 +146,15 @@
 
                 {% if field.type == 'textarea' %}
                 <textarea id="{{ field.name }}" name="{{ field.name }}" {% if field.required %}required{% endif
-                    %}></textarea>
+                    %}>{{ entry.get(field.name, '') }}</textarea>
                 {% else %}
-                <input type="{{ field.type }}" id="{{ field.name }}" name="{{ field.name }}" {% if field.required
-                    %}required{% endif %}>
+                <input type="{{ field.type }}" id="{{ field.name }}" name="{{ field.name }}"
+                    value="{{ entry.get(field.name, '') }}" {% if field.required %}required{% endif %}>
                 {% endif %}
             </div>
             {% endfor %}
 
-            <button type="submit" class="submit-btn">提交表單</button>
+            <button type="submit" class="submit-btn">儲存變更</button>
         </form>
     </div>
 </body>

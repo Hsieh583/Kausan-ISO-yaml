@@ -7,13 +7,28 @@ __pycache__/
 venv/
 env/
 ENV/
+.venv/
+.env
+.env.*
+*.log
+pip-wheel-metadata/
+pip-selfcheck.json
+pyproject.toml
+poetry.lock
+.python-version
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+.mypy_cache/
 
 # Flask
 instance/
 .webassets-cache
 
 # Output files
-output/*.yaml
+output/
 
 # IDEs
 .vscode/
